@@ -62,7 +62,7 @@ void draw3d() {
   float dir_y = sin(player_direction);
   
   
-  PVector plane = new PVector(dir_y, -dir_x);
+  PVector plane = new PVector(dir_y * 0.9, -dir_x);
   
   for(int i = 0; i < width; i++) {
     float camera_x = 2 * i / (float) width - 1;
@@ -121,7 +121,7 @@ void draw3d() {
     if(side == 0) {
       perp_wall_dist = (map_x - player_position.x + (1 - step_x) / 2) / ray_dir_x;
     } else {
-      perp_wall_dist = (map_y - player_position.x + (1 - step_y) / 2) / ray_dir_y;
+      perp_wall_dist = (map_y - player_position.y + (1 - step_y) / 2) / ray_dir_y;
     }
     
     float line_height = 0.5 * height / perp_wall_dist;
