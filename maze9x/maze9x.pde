@@ -47,6 +47,17 @@ color[][] world = new color[][] {
    { RED, MAG, RED, MAG, RED, MAG, RED, MAG }
 };
 
+int[][] brick = new int[][] {
+  { 99,  99,  99,  99,  99,  99,  99,  99  },
+  { 99,  0,   0,   0,   0,   0,   0,   -99 },
+  { 99,  0,   0,   0,   0,   0,   0,   -99 },
+  { 99,  -99, -99, -99, -99, -99, -99, -99 },
+  { 99,  99,  99,  99,  99,  99,  99,  99  },
+  { 0,   0,   0,   -99, 99 , 0,   0,   0   },
+  { 0,   0,   0,   -99, 99 , 0,   0,   0   },
+  { -99, -99, -99, -99, 99 , -99, -99, -99 }
+};
+
 Map<Character, Boolean> keyboardState = new HashMap<Character, Boolean>();
 
 Controller controller = new Player(new PVector(1.5, 1.5), HALF_PI);
@@ -254,6 +265,7 @@ void drawMiniMap(PVector cameraPosition, float cameraAngle) {
   arc(cameraPosition.x * WORLD_TILE_SIZE, cameraPosition.y * WORLD_TILE_SIZE, 16, 16, cameraAngle - 0.4, cameraAngle + 0.4);
 }
 
+// Based on https://lodev.org/cgtutor/raycasting.html
 void draw3d(PVector cameraPosition, float cameraAngle) {
   
   // Convert player direction into vector.
@@ -325,11 +337,36 @@ void draw3d(PVector cameraPosition, float cameraAngle) {
     
     float line_height = 0.5 * height / perp_wall_dist;
     
+    int drawStart = int(-line_height / 2 + height / 2);
+    if(drawStart < 0) drawStart = 0;
+    int drawEnd = int(line_height / 2 + height / 2);
+    if(drawEnd >= height) drawEnd = height - 1;
+    
+    float wallX;
+    if (side == 0) {
+      wallX = cameraPosition.y + perp_wall_dist * ray_dir_y;
+    } else {
+      wallX = cameraPosition.x + perp_wall_dist * ray_dir_x;
+    }
+    wallX -= floor(wallX);
+
+    int texX = int(wallX * float(8));
+    if(side == 0 && ray_dir_x > 0) texX = 8 - texX - 1;
+    if(side == 1 && ray_dir_x < 0) texX = 8 - texX - 1;
+    
     float fog = perp_wall_dist * 32;
     if(side == 0) {
       fog += 10;
     }
-    stroke(red(tile) - fog, green(tile) - fog, blue(tile) - fog);
-    line(i, height / 2 - line_height, i, height / 2 + line_height);
+    
+    float lower = height / 2 - line_height;
+    float upper = height / 2 + line_height;
+    float diff = (upper - lower) / 16;
+    
+    for(int j = 0; j < 16; j++) {
+      int sample = brick[j % 8][texX];
+      stroke(red(tile) - fog + sample, green(tile) - fog + sample, blue(tile) - fog + sample);
+      line(i, lower + diff * j, i, lower + diff * (j + 1));
+    }
   }
 }
