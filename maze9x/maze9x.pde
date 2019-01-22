@@ -266,7 +266,7 @@ void draw3d(PVector cameraPosition, float cameraAngle) {
       side_dist_y = (map_y + 1.0 - cameraPosition.y) * delta_dist_y;
     }
     
-    while(true) { //for(int j = 0; j < 10; j++) {
+    for(int j = 0; j < 32; j++) {
       if(side_dist_x < side_dist_y) {
         side_dist_x += delta_dist_x;
         map_x += step_x;
