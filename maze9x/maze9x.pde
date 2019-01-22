@@ -22,53 +22,14 @@
 
 import java.util.Map;
 
-final color ___ = color(0, 0, 0);
-final color RED = color(255, 0, 0);
-final color YEL = color(255, 255, 0);
-final color GRE = color(0, 255, 0);
-final color CYA = color(0, 255, 255);
-final color BLU = color(0, 0, 255);
-final color MAG = color(255, 0, 255);
-
-final int WORLD_WIDTH = 8;
-final int WORLD_HEIGHT = 8;
 final int WORLD_TILE_SIZE = 16;
 final float PLAYER_TURN_SPEED = 0.1;
 final float PLAYER_MOVE_SPEED = 0.05;
 
-color[][] world = new color[][] {
-   { MAG, RED, MAG, RED, MAG, RED, MAG, RED },
-   { RED, ___, BLU, ___, ___, ___, ___, MAG },
-   { MAG, ___, CYA, ___, BLU, BLU, ___, RED },
-   { RED, ___, GRE, ___, BLU, ___, BLU, MAG },
-   { MAG, ___, ___, ___, BLU, ___, ___, RED },
-   { RED, ___, BLU, ___, BLU, BLU, ___, MAG },
-   { MAG, ___, BLU, ___, ___, ___, ___, RED },
-   { RED, MAG, RED, MAG, RED, MAG, RED, MAG }
-};
-
-int[][] brick = new int[][] {
-  { 99,  99,  99,  99,  99,  99,  99,  99  },
-  { 99,  0,   0,   0,   0,   0,   0,   -99 },
-  { 99,  0,   0,   0,   0,   0,   0,   -99 },
-  { 99,  -99, -99, -99, -99, -99, -99, -99 },
-  { 99,  99,  99,  99,  99,  99,  99,  99  },
-  { 0,   0,   0,   -99, 99 , 0,   0,   0   },
-  { 0,   0,   0,   -99, 99 , 0,   0,   0   },
-  { -99, -99, -99, -99, 99 , -99, -99, -99 }
-};
-
 Map<Character, Boolean> keyboardState = new HashMap<Character, Boolean>();
 
 Controller controller = new Player(new PVector(1.5, 1.5), HALF_PI);
-
-color getTileAt(int x, int y) {
-  if(x >= 0 && x < WORLD_WIDTH && y >= 0 && y < WORLD_HEIGHT) {
-    return world[y][x];
-  } else {
-    return RED;
-  }
-}
+World world = new FixedMaze();
 
 void setup() {
   size(1280, 720);
@@ -99,11 +60,6 @@ void keyPressed() {
 
 void keyReleased() {
   keyboardState.put(key, false);
-}
-
-boolean isTileOccupied(int x, int y) {
-  color tile = getTileAt(x, y);
-  return red(tile) > 0 || green(tile) > 0 || blue(tile) > 0;
 }
 
 static class Heading {
@@ -180,7 +136,7 @@ class WallFollower implements Controller {
   
   private PVector nextPosition() {
     
-    for(int i = 0; i < 4; i++) {
+    /*for(int i = 0; i < 4; i++) {
       int absoluteDirection = (i - direction.value + 4) % 4;
       switch(absoluteDirection) {
         case Heading.EAST:  if(!isTileOccupied(x + 1, y)) return new PVector(x + 1, y);
@@ -188,7 +144,7 @@ class WallFollower implements Controller {
         case Heading.WEST:  if(!isTileOccupied(x - 1, y)) return new PVector(x - 1, y);
         case Heading.SOUTH: if(!isTileOccupied(x, y + 1)) return new PVector(x, y + 1);
       }
-    }
+    }*/
     
     return new PVector(x, y);
   }
@@ -252,9 +208,9 @@ void drawMiniMap(PVector cameraPosition, float cameraAngle) {
 
   // Draw the world.
   stroke(255, 255, 255);
-  for(int x = 0; x < WORLD_WIDTH; x++) {
-    for(int y = 0; y < WORLD_HEIGHT; y++) {
-      fill(world[y][x]);
+  for(int x = 0; x < world.width(); x++) {
+    for(int y = 0; y < world.height(); y++) {
+      fill(world.getColour(new Point(x, y)));
       rect(x * WORLD_TILE_SIZE, y * WORLD_TILE_SIZE, WORLD_TILE_SIZE, WORLD_TILE_SIZE);
     }
   }
@@ -293,7 +249,6 @@ void draw3d(PVector cameraPosition, float cameraAngle) {
     int step_x;
     int step_y;
     
-    int hit = 0;
     int side = 0;
     if(ray_dir_x < 0) {
       step_x = -1;
@@ -311,8 +266,7 @@ void draw3d(PVector cameraPosition, float cameraAngle) {
       side_dist_y = (map_y + 1.0 - cameraPosition.y) * delta_dist_y;
     }
     
-    color tile = color(0, 0, 0);
-    while(hit == 0) {
+    while(true) { //for(int j = 0; j < 10; j++) {
       if(side_dist_x < side_dist_y) {
         side_dist_x += delta_dist_x;
         map_x += step_x;
@@ -323,9 +277,8 @@ void draw3d(PVector cameraPosition, float cameraAngle) {
         side = 1;
       }
       
-      tile = getTileAt(map_x, map_y);
-      if(isTileOccupied(map_x, map_y)) {
-        hit = 1;
+      if(world.isTileOccupied(new Point(map_x, map_y))) {
+        break;
       }
     }
     
@@ -364,8 +317,9 @@ void draw3d(PVector cameraPosition, float cameraAngle) {
     float diff = (upper - lower) / 16;
     
     for(int j = 0; j < 16; j++) {
-      int sample = brick[j % 8][texX];
-      stroke(red(tile) - fog + sample, green(tile) - fog + sample, blue(tile) - fog + sample);
+      PVector uv = new PVector(texX / 8.0, (j % 8) / 8.0);
+      int sample = world.getPixel(new Point(map_x, map_y), uv);
+      stroke(red(sample) - fog, green(sample) - fog, blue(sample) - fog);
       line(i, lower + diff * j, i, lower + diff * (j + 1));
     }
   }
