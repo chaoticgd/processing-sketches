@@ -15,6 +15,13 @@ static final int[][] BRICK = new int[][] {
   { BD, BD, BD, BD, BB, BD, BD, BD }
 };
 
+private final color ___ = #000000;
+private final color RED = #ff0000;
+private final color YEL = #ffff00;
+private final color GRE = #00ff00;
+private final color CYA = #00ffff;
+private final color BLU = #0000ff;
+private final color MAG = #ff00ff;
 
 interface World {
   
@@ -57,13 +64,6 @@ class FixedMaze implements World {
   private final int WORLD_WIDTH = 16;
   private final int WORLD_HEIGHT = 8;
   
-  private final color ___ = #000000;
-  private final color RED = #ff0000;
-  private final color YEL = #ffff00;
-  private final color GRE = #00ff00;
-  private final color CYA = #00ffff;
-  private final color BLU = #0000ff;
-  private final color MAG = #ff00ff;
   private final color[][] world = new color[][] {
      { MAG, RED, MAG, RED, MAG, RED, MAG, RED, MAG, RED, MAG, RED, MAG, RED, MAG, RED },
      { RED, ___, BLU, ___, ___, ___, ___, MAG, ___, ___, ___, BLU, ___, ___, ___, MAG },
@@ -74,4 +74,30 @@ class FixedMaze implements World {
      { MAG, ___, BLU, ___, ___, ___, ___, RED, ___, ___, ___, BLU, ___, ___, ___, RED },
      { RED, MAG, RED, MAG, RED, MAG, RED, MAG, MAG, RED, MAG, RED, MAG, RED, MAG, RED }
   };
+}
+
+class ProceduralMaze implements World {
+  
+  // Return fake values for the width and height.
+  int width() {
+    return 0;
+  }
+  
+  int height() {
+    return 0;
+  }
+  
+  boolean isTileOccupied(Point tile) {
+    return tile.x % 2 == 0 && tile.y % 2 == 0;
+  }
+  
+  color getColour(Point tile) {
+    return RED;
+  }
+  
+  color getPixel(Point tile, PVector uv) {
+    color sample = RED;
+    int detail = BRICK[int(uv.y * 8)][int(uv.x * 8)];
+    return color(red(sample) + detail, green(sample) + detail, blue(sample) + detail);
+  }
 }

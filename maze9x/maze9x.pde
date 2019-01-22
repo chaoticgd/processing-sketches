@@ -29,7 +29,7 @@ final float PLAYER_MOVE_SPEED = 0.05;
 Map<Character, Boolean> keyboardState = new HashMap<Character, Boolean>();
 
 Controller controller = new Player(new PVector(1.5, 1.5), HALF_PI);
-World world = new FixedMaze();
+World world = new ProceduralMaze();
 
 void setup() {
   size(1280, 720);
