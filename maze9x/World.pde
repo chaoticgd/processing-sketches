@@ -96,7 +96,7 @@ class ProceduralMaze implements World {
   }
   
   color getPixel(Point tile, PVector uv) {
-    color sample = RED;
+    color sample = color(random(0, 255), random(0, 255), random(0, 255));
     int detail = BRICK[int(uv.y * 8)][int(uv.x * 8)];
     return color(red(sample) + detail, green(sample) + detail, blue(sample) + detail);
   }
