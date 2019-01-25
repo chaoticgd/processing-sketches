@@ -44,7 +44,7 @@ class FixedMaze implements World {
   }
   
   boolean isTileOccupied(Point tile) {
-    if(tile.x < 0 || tile.y < 0 || tile.x >= WORLD_WIDTH || tile.y >= WORLD_HEIGHT) {
+    if(outOfBounds(tile)) {
       return true;
     }
     
@@ -56,9 +56,17 @@ class FixedMaze implements World {
   }
   
   color getPixel(Point tile, PVector uv) {
+    if(outOfBounds(tile)) {
+      return color(random(0, 10), random(0, 20), random(0, 10));
+    }
+    
     color sample = world[tile.y][tile.x];
     int detail = BRICK[int(uv.y * 8)][int(uv.x * 8)];
     return color(red(sample) + detail, green(sample) + detail, blue(sample) + detail);
+  }
+  
+  private boolean outOfBounds(Point tile) {
+    return tile.x < 0 || tile.y < 0 || tile.x >= WORLD_WIDTH || tile.y >= WORLD_HEIGHT;
   }
   
   private final int WORLD_WIDTH = 16;
