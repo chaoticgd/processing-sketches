@@ -24,12 +24,12 @@ import java.util.Map;
 
 final int WORLD_TILE_SIZE = 16;
 final float PLAYER_TURN_SPEED = 0.1;
-final float PLAYER_MOVE_SPEED = 0.05;
+final float PLAYER_MOVE_SPEED = 0.1;
 
 Map<Character, Boolean> keyboardState = new HashMap<Character, Boolean>();
 
 Controller controller = new Player(new PVector(1.5, 1.5), HALF_PI);
-World world = new ProceduralMaze();
+World world = new FixedMaze();
 
 void setup() {
   size(1280, 720);
