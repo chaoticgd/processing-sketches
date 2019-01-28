@@ -21,13 +21,10 @@
 */
 
 interface Renderer {
-  void setup();
   void draw(World world, Controller controller);
 }
 
 class MiniMapRenderer implements Renderer {
-  
-  void setup() {}
   
   void draw(World world, Controller controller) {
     // Draw the world.
@@ -51,10 +48,6 @@ class MiniMapRenderer implements Renderer {
 
 // Based on https://lodev.org/cgtutor/raycasting.html
 class RaycastingRenderer implements Renderer {
-  
-  void setup() {
-    size(1280, 720);
-  }
   
   void draw(World world, Controller controller) {
     
@@ -161,4 +154,4 @@ class RaycastingRenderer implements Renderer {
       }
     }
   }
-};
+}
