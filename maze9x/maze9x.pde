@@ -28,7 +28,7 @@ final float PLAYER_MOVE_SPEED = 0.1;
 
 Map<Character, Boolean> keyboardState = new HashMap<Character, Boolean>();
 
-Controller controller = new Player(new PVector(1.5, 1.5), HALF_PI);
+Controller controller = new WallFollower();//new Player(new PVector(1.5, 1.5), HALF_PI);
 World world = new FixedMaze();
 Renderer renderer = new RaycastingRenderer();
 
@@ -62,47 +62,6 @@ void keyPressed() {
 void keyReleased() {
   keyboardState.put(key, false);
 }
-
-static class Heading {
-
-  public static final int EAST = 0;
-  public static final int NORTH = 1;
-  public static final int WEST = 2;
-  public static final int SOUTH = 3;
-  
-  public Heading(int v) {
-    value = v;
-  }
-  
-  public float toAngle() {
-    switch(value) {
-      case EAST:   return 0;
-      case NORTH:  return HALF_PI;
-      case WEST:   return PI;
-      case SOUTH:  return PI * 1.5;
-    }
-    return 0;
-  }
-  
-  public static Heading fromVector(int x, int y) {
-    if(x > y) {
-      if(abs(x) > abs(y)) {
-        return new Heading(EAST);
-      } else {
-        return new Heading(NORTH);
-      }
-    } else {
-      if(abs(x) > abs(y)) {
-        return new Heading(WEST);
-      } else {
-        return new Heading(SOUTH);
-      }
-    }
-  }
-  
-  public int value;
-}
-
 
 void drawBackground() {
   for(int y = 0; y < height / 2; y++) {
